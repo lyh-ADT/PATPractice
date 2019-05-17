@@ -24,8 +24,9 @@ bool compareStr(string const& a, string const& b){
     return false;
 }
 
-void findSubStr(string const& str, string const& sub, vector<int>& indexes){
+int findSubStr(string const& str, string const& sub){
     // KMP
+    int subStrCount=0;
     const int n = sub.size();
     vector<int> tb(n, 0);
     tb[0]=-1;
@@ -55,14 +56,15 @@ void findSubStr(string const& str, string const& sub, vector<int>& indexes){
             sub_index = tb[sub_index];
         }
         if(sub_index == n){
-            indexes.push_back(str_index-n);
+            ++subStrCount;
             sub_index=tb[sub_index-1];
             str_index-=n-sub_index-1;
             
         }
     }
+    return subStrCount;
 }
-// abbcabc
+
 int main(){
     int N;
     string s;
@@ -70,27 +72,27 @@ int main(){
     cin.get();
     getline(cin, s);
     const int max_index = s.size()-N-1;
-    vector<int> mostSubStrIndex;
+    int mostSubStrCount=0;
     string mostSubStr;
     map<string, bool> foundSub;
-    for(int i=0; i <= max_index; ++i){
-        vector<int> tmpIndexes;
+    for(int i=0; i <= max_index && max_index-i >= mostSubStrCount; ++i){
+        int tmpSubStrCount=0;
         string tmpString=s.substr(i,N);
         if(foundSub[tmpString]){
             continue;
         } else {
             foundSub[tmpString] = true;
         }
-        findSubStr(s, tmpString, tmpIndexes);
-        if(mostSubStrIndex.size() < tmpIndexes.size()){
-            mostSubStrIndex = tmpIndexes;
+        tmpSubStrCount = findSubStr(s, tmpString);
+        if(mostSubStrCount < tmpSubStrCount){
+            mostSubStrCount = tmpSubStrCount;
             mostSubStr = tmpString;
-        } else if(mostSubStrIndex.size() == tmpIndexes.size()){
+        } else if(mostSubStrCount == tmpSubStrCount){
             if(compareStr(tmpString, mostSubStr)){
                 mostSubStr = tmpString;
             }
         }
     }
-    cout << mostSubStr << " " << mostSubStrIndex.size();
+    cout << mostSubStr << " " << mostSubStrCount;
     return 0;
 }
